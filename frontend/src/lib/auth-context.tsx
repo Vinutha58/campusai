@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useMemo, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import type { Role } from "./types";
 
@@ -11,7 +11,6 @@ export type MockUser = {
 
 type AuthContextValue = {
   user: MockUser | null;
-  isLoading: boolean;
   loginAs: (role: Role) => void;
   logout: () => void;
 };
@@ -27,46 +26,74 @@ const DEMO_NAMES: Record<Role, string> = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// localStorage is an external store, so it's read via useSyncExternalStore
+// (the React-sanctioned way to do this) rather than useState+useEffect,
+// which avoids an extra render pass and a "setState in effect" lint error.
+const listeners = new Set<() => void>();
+
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    listeners.delete(callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function notifyListeners() {
+  listeners.forEach((listener) => listener());
+}
+
+function getSnapshot(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function getServerSnapshot() {
+  return null;
+}
+
+function writeUser(user: MockUser | null) {
+  try {
+    if (user) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {
+    // localStorage unavailable (private mode, etc.) — state won't persist, but the app still works
+  }
+  notifyListeners();
+}
+
 // Phase 1 stand-in for real auth: picks a demo identity per role and
 // remembers it in localStorage. Swap loginAs()'s body for a real API call
 // once college-email OTP login is built — nothing else here should need to change.
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<MockUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  useEffect(() => {
+  const user = useMemo<MockUser | null>(() => {
+    if (!raw) return null;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setUser(JSON.parse(raw));
+      return JSON.parse(raw) as MockUser;
     } catch {
-      // localStorage unavailable (private mode, etc.) — fall back to logged-out
+      return null;
     }
-    setIsLoading(false);
-  }, []);
+  }, [raw]);
 
   const loginAs = (role: Role) => {
-    const nextUser: MockUser = { name: DEMO_NAMES[role], role };
-    setUser(nextUser);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
-    } catch {
-      // ignore
-    }
+    writeUser({ name: DEMO_NAMES[role], role });
   };
 
   const logout = () => {
-    setUser(null);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+    writeUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, loginAs, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loginAs, logout }}>{children}</AuthContext.Provider>
   );
 }
 
