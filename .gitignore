@@ -1,0 +1,36 @@
+# Node / Next.js
+node_modules/
+.next/
+out/
+frontend/.env*.local
+
+# Python / FastAPI
+__pycache__/
+*.pyc
+backend/venv/
+backend/.venv/
+backend/.env
+
+# Env files (all)
+.env
+.env.local
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build output
+dist/
+build/
+
+# Mongo local data (if bind-mounted)
+mongo-data/
