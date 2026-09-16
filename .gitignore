@@ -11,6 +11,9 @@ backend/venv/
 backend/.venv/
 backend/.env
 
+# Uploaded files (local dev storage)
+backend/uploads/
+
 # Env files (all)
 .env
 .env.local

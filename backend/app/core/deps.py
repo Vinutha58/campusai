@@ -35,3 +35,15 @@ async def get_current_user(
         raise unauthorized
 
     return to_public_user(user_doc)
+
+
+def require_role(*roles: str):
+    async def check(current_user: UserPublic = Depends(get_current_user)) -> UserPublic:
+        if current_user.role.value not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have permission to do that",
+            )
+        return current_user
+
+    return check

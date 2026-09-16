@@ -6,6 +6,7 @@ Usage (from backend/, with the venv): python -m app.seed
 """
 
 import asyncio
+from datetime import datetime, timezone
 
 from app.core.security import hash_password
 from app.db.mongodb import get_database
@@ -41,6 +42,49 @@ async def seed() -> None:
         doc = new_user_document(data, hash_password(entry["password"]))
         await db.users.insert_one(doc)
         print(f"created: {entry['email']} ({entry['role']})")
+
+    await seed_courses(db)
+
+
+SEED_COURSES = [
+    {
+        "name": "Data Structures",
+        "code": "CS201",
+        "faculty_email": "faculty1@campusai.edu",
+        "student_emails": ["student1@campusai.edu", "student2@campusai.edu"],
+    },
+    {
+        "name": "Database Systems",
+        "code": "CS304",
+        "faculty_email": "faculty2@campusai.edu",
+        "student_emails": ["student1@campusai.edu"],
+    },
+]
+
+
+async def seed_courses(db) -> None:
+    for entry in SEED_COURSES:
+        if await db.courses.find_one({"code": entry["code"]}):
+            print(f"skip (already exists): {entry['code']}")
+            continue
+
+        faculty = await db.users.find_one({"email": entry["faculty_email"]})
+        students = await db.users.find(
+            {"email": {"$in": entry["student_emails"]}}
+        ).to_list(length=50)
+
+        await db.courses.insert_one(
+            {
+                "name": entry["name"],
+                "code": entry["code"],
+                "description": "",
+                "faculty_id": faculty["_id"],
+                "faculty_name": faculty["name"],
+                "student_ids": [s["_id"] for s in students],
+                "created_at": datetime.now(timezone.utc),
+            }
+        )
+        print(f"created course: {entry['code']} ({entry['name']})")
 
 
 if __name__ == "__main__":
