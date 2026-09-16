@@ -2,33 +2,37 @@
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
+import { loginUser, registerUser } from "./api";
+import { decodeJwtPayload, isExpired } from "./jwt";
 import type { Role } from "./types";
 
-export type MockUser = {
+export type AuthUser = {
+  id: string;
   name: string;
   role: Role;
 };
 
+type TokenPayload = {
+  sub: string;
+  name: string;
+  role: Role;
+  exp: number;
+};
+
 type AuthContextValue = {
-  user: MockUser | null;
-  loginAs: (role: Role) => void;
+  user: AuthUser | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (input: { name: string; email: string; password: string; role: Role }) => Promise<void>;
   logout: () => void;
 };
 
-const STORAGE_KEY = "campusai.mockUser";
-
-const DEMO_NAMES: Record<Role, string> = {
-  student: "Aditi Sharma",
-  faculty: "Dr. Rajesh Kumar",
-  placement_officer: "Meera Iyer",
-  admin: "Admin User",
-};
+const STORAGE_KEY = "campusai.token";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// localStorage is an external store, so it's read via useSyncExternalStore
-// (the React-sanctioned way to do this) rather than useState+useEffect,
-// which avoids an extra render pass and a "setState in effect" lint error.
+// The JWT in localStorage is the external store here (see the Phase 1 fix
+// that replaced useEffect+setState with useSyncExternalStore for the same
+// reason: avoids a hydration race and a setState-in-effect lint error).
 const listeners = new Set<() => void>();
 
 function subscribe(callback: () => void) {
@@ -56,44 +60,45 @@ function getServerSnapshot() {
   return null;
 }
 
-function writeUser(user: MockUser | null) {
+function writeToken(token: string | null) {
   try {
-    if (user) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    if (token) {
+      localStorage.setItem(STORAGE_KEY, token);
     } else {
       localStorage.removeItem(STORAGE_KEY);
     }
   } catch {
-    // localStorage unavailable (private mode, etc.) — state won't persist, but the app still works
+    // localStorage unavailable (private mode, etc.) — session just won't persist
   }
   notifyListeners();
 }
 
-// Phase 1 stand-in for real auth: picks a demo identity per role and
-// remembers it in localStorage. Swap loginAs()'s body for a real API call
-// once college-email OTP login is built — nothing else here should need to change.
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const token = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const user = useMemo<MockUser | null>(() => {
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw) as MockUser;
-    } catch {
-      return null;
-    }
-  }, [raw]);
+  const user = useMemo<AuthUser | null>(() => {
+    if (!token) return null;
+    const payload = decodeJwtPayload<TokenPayload>(token);
+    if (!payload || isExpired(payload.exp)) return null;
+    return { id: payload.sub, name: payload.name, role: payload.role };
+  }, [token]);
 
-  const loginAs = (role: Role) => {
-    writeUser({ name: DEMO_NAMES[role], role });
+  const login = async (email: string, password: string) => {
+    const res = await loginUser({ email, password });
+    writeToken(res.access_token);
+  };
+
+  const register = async (input: { name: string; email: string; password: string; role: Role }) => {
+    const res = await registerUser(input);
+    writeToken(res.access_token);
   };
 
   const logout = () => {
-    writeUser(null);
+    writeToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loginAs, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, login, register, logout }}>{children}</AuthContext.Provider>
   );
 }
 
@@ -101,4 +106,8 @@ export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
   return ctx;
+}
+
+export function getStoredToken(): string | null {
+  return getSnapshot();
 }
