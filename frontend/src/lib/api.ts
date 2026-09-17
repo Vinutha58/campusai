@@ -109,6 +109,9 @@ async function handleResponse<T>(res: Response): Promise<T> {
     const data = await res.json().catch(() => null);
     throw new ApiError(data?.detail ?? "Something went wrong. Please try again.", res.status);
   }
+  if (res.status === 204) {
+    return undefined as T;
+  }
   return res.json();
 }
 
@@ -680,6 +683,34 @@ export function markNotificationRead(id: string) {
 
 export function markAllNotificationsRead() {
   return authedJson<{ status: string }>("/api/notifications/read-all", { method: "POST" });
+}
+
+// CampusGPT
+export type ChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+};
+
+export type ChatExchange = {
+  user_message: ChatMessage;
+  assistant_message: ChatMessage;
+};
+
+export function getChatHistory() {
+  return authedJson<ChatMessage[]>("/api/campusgpt/messages");
+}
+
+export function sendChatMessage(content: string) {
+  return authedJson<ChatExchange>("/api/campusgpt/messages", {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
+}
+
+export function clearChatHistory() {
+  return authedJson<void>("/api/campusgpt/messages", { method: "DELETE" });
 }
 
 // Search

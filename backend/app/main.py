@@ -12,6 +12,7 @@ from app.routers import (
     assignments,
     attendance,
     auth,
+    campusgpt,
     companies,
     courses,
     drives,
@@ -62,3 +63,4 @@ app.include_router(network.router, prefix="/api/network", tags=["network"])
 app.include_router(messages.router, prefix="/api/messages", tags=["messages"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 app.include_router(search.router, prefix="/api/search", tags=["search"])
+app.include_router(campusgpt.router, prefix="/api/campusgpt", tags=["campusgpt"])

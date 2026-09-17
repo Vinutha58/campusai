@@ -6,7 +6,7 @@ CampusAI unifies academics, an AI assistant, career development, placements, and
 
 ## Status
 
-🚧 **All 4 roles, Campus Network, Messaging, Notifications, and Search are live.** Real authentication, complete Faculty/Placement/Admin tools, a working social layer (profiles, feed, follows), direct messaging, a real-time notification center (assignments, materials, quizzes, marks, attendance, placements, applications, network activity, messages), and role-aware global search across people, courses, opportunities, companies, materials, and posts. CampusGPT and Career AI are what's left — see milestones below.
+🚧 **All 4 roles, Campus Network, Messaging, Notifications, Search, and CampusGPT are live.** Real authentication, complete Faculty/Placement/Admin tools, a working social layer (profiles, feed, follows), direct messaging, a real-time notification center, role-aware global search, and an AI chat assistant for students backed by a swappable OpenAI/Gemini/Claude provider layer — **CampusGPT needs a real API key entered in AI Configuration (Admin) before it will actually respond.** Career AI is what's left — see milestones below.
 
 ## Tech stack
 
@@ -14,7 +14,7 @@ CampusAI unifies academics, an AI assistant, career development, placements, and
 - **Backend:** FastAPI (Python), modular routers
 - **Database:** MongoDB (via Docker Compose for local dev)
 - **Auth:** Real email + password, bcrypt-hashed, JWT sessions. College-email OTP is deferred until an email-sending provider is set up.
-- **AI:** Centralized provider-adapter layer (OpenAI / Gemini / Claude) — added in a later milestone
+- **AI:** Centralized provider-adapter layer (OpenAI / Gemini / Claude), configured by an admin in AI Configuration and consumed by CampusGPT
 
 ## Project structure
 
@@ -82,4 +82,5 @@ App available at `http://localhost:3000`. Register a new account from the landin
 - [x] Messaging — conversations, unread counts, message history, user search (Student/Faculty/Placement Officer)
 - [x] Notifications — real-time notification center covering assignments, materials, quizzes, marks, attendance, placement drives, application status, Campus Network activity, and messages, for all 4 roles
 - [x] Search — role-aware global search across people, courses, opportunities, companies, materials, and Campus Network posts
-- [ ] CampusGPT and Career AI
+- [x] CampusGPT — AI chat assistant for students (doubts, notes, study plans), backed by a swappable OpenAI/Gemini/Claude provider layer configured in AI Configuration — requires a real API key to produce actual responses
+- [ ] Career AI
