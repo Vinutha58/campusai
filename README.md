@@ -6,7 +6,7 @@ CampusAI unifies academics, an AI assistant, career development, placements, and
 
 ## Status
 
-🚧 **All 4 roles have their full dashboards and feature sets, plus Campus Network is live.** Real authentication, complete Faculty/Placement/Admin tools, and now a working social layer: profiles (bio, skills, certifications, achievements), a feed (post/like/comment, categorized by achievement/certification/internship/placement/academic), and a follow system with an admin moderation view. CampusGPT, Career AI, Messaging, Notifications, and Search are what's left — see milestones below.
+🚧 **All 4 roles, Campus Network, and Messaging are live.** Real authentication, complete Faculty/Placement/Admin tools, a working social layer (profiles, feed, follows), and now real-time-feeling direct messaging between students, faculty, and placement officers — conversation list with unread counts, message history, and a user search to start new conversations. CampusGPT, Career AI, Notifications, and Search are what's left — see milestones below.
 
 ## Tech stack
 
@@ -79,5 +79,6 @@ App available at `http://localhost:3000`. Register a new account from the landin
 - [x] Placement Officer — dashboard, companies, drives, opportunities, applications, students, analytics
 - [x] Admin — dashboard, user management (roles/activation), courses, companies/placement oversight, academic/placement/platform analytics, AI configuration, platform settings
 - [x] Campus Network — profiles, feed (posts/likes/comments), follow system, admin moderation
+- [x] Messaging — conversations, unread counts, message history, user search (Student/Faculty/Placement Officer)
 - [ ] CampusGPT and Career AI
-- [ ] Messaging, notifications, search
+- [ ] Notifications, search

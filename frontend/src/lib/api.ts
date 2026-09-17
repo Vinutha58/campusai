@@ -595,6 +595,54 @@ export function addComment(postId: string, text: string) {
   });
 }
 
+// Messaging
+export type Conversation = {
+  id: string;
+  other_user_id: string;
+  other_user_name: string;
+  other_user_role: string;
+  last_message: string | null;
+  last_message_at: string | null;
+  unread_count: number;
+};
+
+export type Message = {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  sender_name: string;
+  text: string;
+  created_at: string;
+};
+
+export type UserSearchResult = { id: string; name: string; email: string; role: string };
+
+export function getConversations() {
+  return authedJson<Conversation[]>("/api/messages/conversations");
+}
+
+export function startConversation(otherUserId: string) {
+  return authedJson<Conversation>("/api/messages/conversations", {
+    method: "POST",
+    body: JSON.stringify({ other_user_id: otherUserId }),
+  });
+}
+
+export function getMessages(conversationId: string) {
+  return authedJson<Message[]>(`/api/messages/conversations/${conversationId}/messages`);
+}
+
+export function sendMessage(conversationId: string, text: string) {
+  return authedJson<Message>(`/api/messages/conversations/${conversationId}/messages`, {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  });
+}
+
+export function searchUsersToMessage(q: string) {
+  return authedJson<UserSearchResult[]>(`/api/messages/search?q=${encodeURIComponent(q)}`);
+}
+
 // Authenticated file download (can't use a plain <a href> since it needs the Bearer header)
 export async function downloadFile(path: string, filename: string) {
   const res = await fetch(`${API_URL}${path}`, { headers: authHeaders() });
