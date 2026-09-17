@@ -5,7 +5,21 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.db.mongodb import get_database
-from app.routers import assignments, attendance, auth, courses, health, materials, marks, quizzes
+from app.routers import (
+    analytics,
+    applications,
+    assignments,
+    attendance,
+    auth,
+    companies,
+    courses,
+    drives,
+    health,
+    materials,
+    marks,
+    quizzes,
+    students,
+)
 
 
 @asynccontextmanager
@@ -33,3 +47,8 @@ app.include_router(assignments.router, prefix="/api/assignments", tags=["assignm
 app.include_router(quizzes.router, prefix="/api/quizzes", tags=["quizzes"])
 app.include_router(materials.router, prefix="/api/materials", tags=["materials"])
 app.include_router(marks.router, prefix="/api/marks", tags=["marks"])
+app.include_router(companies.router, prefix="/api/companies", tags=["companies"])
+app.include_router(drives.router, prefix="/api/drives", tags=["drives"])
+app.include_router(applications.router, prefix="/api/applications", tags=["applications"])
+app.include_router(students.router, prefix="/api/students", tags=["students"])
+app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])

@@ -6,7 +6,7 @@ CampusAI unifies academics, an AI assistant, career development, placements, and
 
 ## Status
 
-🚧 **Faculty's full feature set is live.** Real authentication, role-aware navigation, the Student + Faculty dashboards, and complete Faculty tools — course/roster management, attendance, assignments (with grading), quizzes (with auto-grading), materials (file upload/download), and marks — all working against real data. Placement Officer / Admin dashboards and every AI/placement/network feature are being added one at a time — see milestones below.
+🚧 **Placement Officer's full feature set is live**, alongside Faculty's. Real authentication, role-aware navigation, Student + Faculty + Placement Officer dashboards, complete Faculty tools (courses, attendance, assignments, quizzes, materials, marks), and complete Placement tools — companies, drives with eligibility criteria, student applications with a full status pipeline, and placement analytics. Admin dashboard and every AI/network feature are being added one at a time — see milestones below.
 
 ## Tech stack
 
@@ -76,9 +76,8 @@ App available at `http://localhost:3000`. Register a new account from the landin
 - [x] Project scaffold, role-aware navigation shell, Student dashboard (sample data)
 - [x] Real authentication (email + password, JWT, seeded multi-user accounts) — college-email OTP layered in later
 - [x] Faculty — dashboard, courses, students, attendance, assignments, quizzes, materials, marks
-- [ ] Placement Officer dashboard
+- [x] Placement Officer — dashboard, companies, drives, opportunities, applications, students, analytics
 - [ ] Admin dashboard
 - [ ] CampusGPT and Career AI
-- [ ] Placement Portal
 - [ ] Campus Network
 - [ ] Messaging, notifications, search, analytics

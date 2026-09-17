@@ -3,6 +3,7 @@
 import { useAuth } from "@/lib/auth-context";
 import { StudentDashboard } from "@/components/dashboard/StudentDashboard";
 import { FacultyDashboard } from "@/components/dashboard/FacultyDashboard";
+import { PlacementOfficerDashboard } from "@/components/dashboard/PlacementOfficerDashboard";
 import { ComingSoon } from "@/components/dashboard/ComingSoon";
 import { ROLE_LABELS } from "@/lib/types";
 
@@ -16,6 +17,10 @@ export default function DashboardPage() {
 
   if (user.role === "faculty") {
     return <FacultyDashboard />;
+  }
+
+  if (user.role === "placement_officer") {
+    return <PlacementOfficerDashboard />;
   }
 
   return <ComingSoon title={`${ROLE_LABELS[user.role]} Dashboard`} />;

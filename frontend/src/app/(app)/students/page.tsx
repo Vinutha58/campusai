@@ -5,7 +5,15 @@ import type { FormEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useMyCourses } from "@/hooks/useMyCourses";
 import { CourseSelect, NoCourses } from "@/components/faculty/CourseSelect";
-import { addStudentToCourse, getRoster, removeStudentFromCourse, ApiError, type RosterEntry } from "@/lib/api";
+import {
+  addStudentToCourse,
+  getRoster,
+  getStudentsDirectory,
+  removeStudentFromCourse,
+  ApiError,
+  type AuthUser,
+  type RosterEntry,
+} from "@/lib/api";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { ComingSoon } from "@/components/dashboard/ComingSoon";
 import { UserMinus } from "lucide-react";
@@ -114,10 +122,41 @@ function FacultyStudents() {
   );
 }
 
+function PlacementStudents() {
+  const [students, setStudents] = useState<AuthUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getStudentsDirectory()
+      .then(setStudents)
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  return (
+    <Card>
+      <CardHeader title="Students" subtitle={isLoading ? "Loading..." : `${students.length} student(s)`} />
+      <ul className="space-y-2">
+        {students.map((s) => (
+          <li key={s.id} className="flex items-center justify-between rounded-xl border border-zinc-100 px-4 py-2.5 dark:border-zinc-800">
+            <div>
+              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">{s.name}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">{s.email}</p>
+            </div>
+          </li>
+        ))}
+        {!isLoading && students.length === 0 && (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">No students registered yet.</p>
+        )}
+      </ul>
+    </Card>
+  );
+}
+
 export default function StudentsPage() {
   const { user } = useAuth();
   if (!user) return null;
 
   if (user.role === "faculty") return <FacultyStudents />;
+  if (user.role === "placement_officer") return <PlacementStudents />;
   return <ComingSoon title="Students" />;
 }
