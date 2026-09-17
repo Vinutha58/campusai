@@ -18,6 +18,7 @@ from app.routers import (
     health,
     materials,
     marks,
+    network,
     quizzes,
     students,
 )
@@ -54,3 +55,4 @@ app.include_router(applications.router, prefix="/api/applications", tags=["appli
 app.include_router(students.router, prefix="/api/students", tags=["students"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+app.include_router(network.router, prefix="/api/network", tags=["network"])

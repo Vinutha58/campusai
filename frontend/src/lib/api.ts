@@ -501,6 +501,100 @@ export function updateAIConfig(input: { provider: AIProviderName; api_key?: stri
   return authedJson<AIConfig>("/api/admin/ai-config", { method: "PUT", body: JSON.stringify(input) });
 }
 
+// Campus Network: profiles
+export type Profile = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  bio: string;
+  skills: string[];
+  certifications: string[];
+  achievements: string[];
+  followers_count: number;
+  following_count: number;
+  is_following: boolean;
+  is_me: boolean;
+};
+
+export type ProfileInput = {
+  bio: string;
+  skills: string[];
+  certifications: string[];
+  achievements: string[];
+};
+
+export function getMyProfile() {
+  return authedJson<Profile>("/api/network/profile/me");
+}
+
+export function updateMyProfile(input: ProfileInput) {
+  return authedJson<Profile>("/api/network/profile/me", { method: "PUT", body: JSON.stringify(input) });
+}
+
+export function getProfile(userId: string) {
+  return authedJson<Profile>(`/api/network/profile/${userId}`);
+}
+
+export function discoverPeople() {
+  return authedJson<Profile[]>("/api/network/people");
+}
+
+export function followUser(userId: string) {
+  return authedJson<Profile>(`/api/network/follow/${userId}`, { method: "POST" });
+}
+
+export function unfollowUser(userId: string) {
+  return authedJson<Profile>(`/api/network/follow/${userId}`, { method: "DELETE" });
+}
+
+// Campus Network: posts
+export type PostCategory = "general" | "achievement" | "certification" | "internship" | "placement" | "academic";
+
+export type Comment = {
+  id: string;
+  author_id: string;
+  author_name: string;
+  text: string;
+  created_at: string;
+};
+
+export type Post = {
+  id: string;
+  author_id: string;
+  author_name: string;
+  author_role: string;
+  content: string;
+  category: PostCategory;
+  like_count: number;
+  liked_by_me: boolean;
+  comments: Comment[];
+  created_at: string;
+};
+
+export function getFeed() {
+  return authedJson<Post[]>("/api/network/feed");
+}
+
+export function createPost(input: { content: string; category: PostCategory }) {
+  return authedJson<Post>("/api/network/posts", { method: "POST", body: JSON.stringify(input) });
+}
+
+export function deletePost(postId: string) {
+  return authedJson<void>(`/api/network/posts/${postId}`, { method: "DELETE" });
+}
+
+export function toggleLike(postId: string) {
+  return authedJson<Post>(`/api/network/posts/${postId}/like`, { method: "POST" });
+}
+
+export function addComment(postId: string, text: string) {
+  return authedJson<Post>(`/api/network/posts/${postId}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  });
+}
+
 // Authenticated file download (can't use a plain <a href> since it needs the Bearer header)
 export async function downloadFile(path: string, filename: string) {
   const res = await fetch(`${API_URL}${path}`, { headers: authHeaders() });
