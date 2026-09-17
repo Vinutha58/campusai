@@ -16,7 +16,9 @@ router = APIRouter()
 @router.post("", response_model=DrivePublic, status_code=status.HTTP_201_CREATED)
 async def create_drive(
     data: DriveCreate,
-    current_user: UserPublic = Depends(require_role(UserRole.PLACEMENT_OFFICER.value)),
+    current_user: UserPublic = Depends(
+        require_role(UserRole.PLACEMENT_OFFICER.value, UserRole.ADMIN.value)
+    ),
 ):
     company = await get_company_or_404(data.company_id)
     db = get_database()
@@ -54,7 +56,9 @@ async def get_drive(drive_id: str, current_user: UserPublic = Depends(get_curren
 async def update_drive(
     drive_id: str,
     data: DriveCreate,
-    current_user: UserPublic = Depends(require_role(UserRole.PLACEMENT_OFFICER.value)),
+    current_user: UserPublic = Depends(
+        require_role(UserRole.PLACEMENT_OFFICER.value, UserRole.ADMIN.value)
+    ),
 ):
     drive = await get_drive_or_404(drive_id)
     company = await get_company_or_404(data.company_id)

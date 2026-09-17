@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useMyCourses } from "@/hooks/useMyCourses";
-import { ApiError, createCourse, getEnrolledCourses, type Course } from "@/lib/api";
+import { ApiError, createCourse, getAllCourses, getEnrolledCourses, type Course } from "@/lib/api";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { ComingSoon } from "@/components/dashboard/ComingSoon";
 
@@ -129,11 +129,43 @@ function StudentCourses() {
   );
 }
 
+function AdminCourses() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getAllCourses()
+      .then(setCourses)
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  return (
+    <Card>
+      <CardHeader title="All Courses" subtitle={isLoading ? "Loading..." : `${courses.length} course(s)`} />
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {courses.map((c) => (
+          <li key={c.id} className="rounded-xl border border-zinc-100 px-4 py-3 dark:border-zinc-800">
+            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">{c.name}</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              {c.code} · {c.faculty_name}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{c.student_count} student(s)</p>
+          </li>
+        ))}
+        {!isLoading && courses.length === 0 && (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">No courses created yet.</p>
+        )}
+      </ul>
+    </Card>
+  );
+}
+
 export default function CoursesPage() {
   const { user } = useAuth();
   if (!user) return null;
 
   if (user.role === "faculty") return <FacultyCourses />;
   if (user.role === "student") return <StudentCourses />;
+  if (user.role === "admin") return <AdminCourses />;
   return <ComingSoon title="Courses" />;
 }

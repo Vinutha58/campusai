@@ -16,6 +16,7 @@ import {
 } from "@/lib/api";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { ComingSoon } from "@/components/dashboard/ComingSoon";
+import { AdminUserList } from "@/components/admin/AdminUserList";
 import { UserMinus } from "lucide-react";
 
 function FacultyStudents() {
@@ -158,5 +159,6 @@ export default function StudentsPage() {
 
   if (user.role === "faculty") return <FacultyStudents />;
   if (user.role === "placement_officer") return <PlacementStudents />;
+  if (user.role === "admin") return <AdminUserList roleFilter="student" title="Students" />;
   return <ComingSoon title="Students" />;
 }

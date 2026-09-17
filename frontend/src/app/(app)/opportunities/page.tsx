@@ -118,6 +118,6 @@ export default function OpportunitiesPage() {
   if (!user) return null;
 
   if (user.role === "student") return <StudentOpportunities />;
-  if (user.role === "placement_officer") return <PlacementOpportunities />;
+  if (user.role === "placement_officer" || user.role === "admin") return <PlacementOpportunities />;
   return <ComingSoon title="Opportunities" />;
 }

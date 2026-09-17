@@ -43,6 +43,11 @@ async def login(data: UserLogin):
     if doc is None or not verify_password(data.password, doc["hashed_password"]):
         raise invalid_credentials
 
+    if not doc.get("is_active", True):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="This account has been deactivated"
+        )
+
     public_user = to_public_user(doc)
     token = create_access_token(user_id=public_user.id, name=public_user.name, role=public_user.role.value)
     return TokenResponse(access_token=token, user=public_user)

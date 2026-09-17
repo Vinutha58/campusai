@@ -26,7 +26,9 @@ class PlacementAnalytics(BaseModel):
 
 @router.get("/placement", response_model=PlacementAnalytics)
 async def placement_analytics(
-    current_user: UserPublic = Depends(require_role(UserRole.PLACEMENT_OFFICER.value)),
+    current_user: UserPublic = Depends(
+        require_role(UserRole.PLACEMENT_OFFICER.value, UserRole.ADMIN.value)
+    ),
 ):
     db = get_database()
 

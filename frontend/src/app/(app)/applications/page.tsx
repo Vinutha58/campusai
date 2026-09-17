@@ -153,7 +153,7 @@ export default function ApplicationsPage() {
   const { user } = useAuth();
   if (!user) return null;
 
-  if (user.role === "placement_officer") return <PlacementApplications />;
+  if (user.role === "placement_officer" || user.role === "admin") return <PlacementApplications />;
   if (user.role === "student") return <StudentApplications />;
   return <ComingSoon title="Applications" />;
 }

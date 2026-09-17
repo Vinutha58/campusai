@@ -133,6 +133,6 @@ export default function CompaniesPage() {
   const { user } = useAuth();
   if (!user) return null;
 
-  if (user.role === "placement_officer") return <PlacementCompanies />;
+  if (user.role === "placement_officer" || user.role === "admin") return <PlacementCompanies />;
   return <ComingSoon title="Companies" />;
 }

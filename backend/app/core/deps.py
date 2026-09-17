@@ -31,7 +31,7 @@ async def get_current_user(
 
     db = get_database()
     user_doc = await db.users.find_one({"_id": user_id})
-    if user_doc is None:
+    if user_doc is None or not user_doc.get("is_active", True):
         raise unauthorized
 
     return to_public_user(user_doc)

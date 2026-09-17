@@ -417,6 +417,90 @@ export function getPlacementAnalytics() {
   return authedJson<PlacementAnalytics>("/api/analytics/placement");
 }
 
+// Admin: courses oversight
+export function getAllCourses() {
+  return authedJson<Course[]>("/api/courses/all");
+}
+
+// Admin: user management
+export function getAdminUsers(role?: Role) {
+  return authedJson<AuthUser[]>(`/api/admin/users${role ? `?role=${role}` : ""}`);
+}
+
+export function updateUserRole(userId: string, role: Role) {
+  return authedJson<AuthUser>(`/api/admin/users/${userId}/role`, {
+    method: "PATCH",
+    body: JSON.stringify({ role }),
+  });
+}
+
+export function updateUserActive(userId: string, isActive: boolean) {
+  return authedJson<AuthUser>(`/api/admin/users/${userId}/active`, {
+    method: "PATCH",
+    body: JSON.stringify({ is_active: isActive }),
+  });
+}
+
+// Admin: analytics
+export type AcademicAnalytics = {
+  total_courses: number;
+  total_students: number;
+  total_faculty: number;
+  total_assignments: number;
+  total_quizzes: number;
+  avg_attendance_percent: number;
+};
+
+export function getAcademicAnalytics() {
+  return authedJson<AcademicAnalytics>("/api/admin/analytics/academic");
+}
+
+export type PlatformStats = {
+  students: number;
+  faculty: number;
+  placement_officers: number;
+  admins: number;
+  total_courses: number;
+  total_companies: number;
+  total_drives: number;
+  total_applications: number;
+};
+
+export function getPlatformAnalytics() {
+  return authedJson<PlatformStats>("/api/admin/analytics/platform");
+}
+
+// Admin: platform settings
+export type PlatformSettings = { college_name: string; college_domain: string };
+
+export function getPlatformSettings() {
+  return authedJson<PlatformSettings>("/api/admin/settings");
+}
+
+export function updatePlatformSettings(input: PlatformSettings) {
+  return authedJson<PlatformSettings>("/api/admin/settings", {
+    method: "PUT",
+    body: JSON.stringify(input),
+  });
+}
+
+// Admin: AI configuration
+export type AIProviderName = "openai" | "gemini" | "claude";
+
+export type AIConfig = {
+  provider: AIProviderName | null;
+  has_key: boolean;
+  key_preview: string | null;
+};
+
+export function getAIConfig() {
+  return authedJson<AIConfig>("/api/admin/ai-config");
+}
+
+export function updateAIConfig(input: { provider: AIProviderName; api_key?: string }) {
+  return authedJson<AIConfig>("/api/admin/ai-config", { method: "PUT", body: JSON.stringify(input) });
+}
+
 // Authenticated file download (can't use a plain <a href> since it needs the Bearer header)
 export async function downloadFile(path: string, filename: string) {
   const res = await fetch(`${API_URL}${path}`, { headers: authHeaders() });

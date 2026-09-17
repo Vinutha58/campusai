@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.mongodb import get_database
 from app.routers import (
+    admin,
     analytics,
     applications,
     assignments,
@@ -52,3 +53,4 @@ app.include_router(drives.router, prefix="/api/drives", tags=["drives"])
 app.include_router(applications.router, prefix="/api/applications", tags=["applications"])
 app.include_router(students.router, prefix="/api/students", tags=["students"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+app.include_router(admin.router, prefix="/api/admin", tags=["admin"])

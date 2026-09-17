@@ -197,6 +197,6 @@ export default function DrivesPage() {
   const { user } = useAuth();
   if (!user) return null;
 
-  if (user.role === "placement_officer") return <PlacementDrives />;
+  if (user.role === "placement_officer" || user.role === "admin") return <PlacementDrives />;
   return <ComingSoon title="Placement Drives" />;
 }

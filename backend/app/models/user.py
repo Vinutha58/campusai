@@ -28,6 +28,7 @@ class UserPublic(BaseModel):
     name: str
     email: EmailStr
     role: UserRole
+    is_active: bool
     created_at: datetime
 
 
@@ -37,12 +38,21 @@ class TokenResponse(BaseModel):
     user: UserPublic
 
 
+class RoleUpdate(BaseModel):
+    role: UserRole
+
+
+class ActiveUpdate(BaseModel):
+    is_active: bool
+
+
 def new_user_document(data: UserRegister, hashed_password: str) -> dict:
     return {
         "name": data.name,
         "email": data.email.lower(),
         "hashed_password": hashed_password,
         "role": data.role.value,
+        "is_active": True,
         "created_at": datetime.now(timezone.utc),
     }
 
@@ -53,5 +63,6 @@ def to_public_user(doc: dict) -> UserPublic:
         name=doc["name"],
         email=doc["email"],
         role=doc["role"],
+        is_active=doc.get("is_active", True),
         created_at=doc["created_at"],
     )

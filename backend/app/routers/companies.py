@@ -12,7 +12,9 @@ router = APIRouter()
 @router.post("", response_model=CompanyPublic, status_code=status.HTTP_201_CREATED)
 async def create_company(
     data: CompanyCreate,
-    current_user: UserPublic = Depends(require_role(UserRole.PLACEMENT_OFFICER.value)),
+    current_user: UserPublic = Depends(
+        require_role(UserRole.PLACEMENT_OFFICER.value, UserRole.ADMIN.value)
+    ),
 ):
     db = get_database()
     doc = new_company_document(data)
@@ -32,7 +34,9 @@ async def list_companies(current_user: UserPublic = Depends(get_current_user)):
 async def update_company(
     company_id: str,
     data: CompanyCreate,
-    current_user: UserPublic = Depends(require_role(UserRole.PLACEMENT_OFFICER.value)),
+    current_user: UserPublic = Depends(
+        require_role(UserRole.PLACEMENT_OFFICER.value, UserRole.ADMIN.value)
+    ),
 ):
     company = await get_company_or_404(company_id)
     db = get_database()
@@ -55,7 +59,9 @@ async def update_company(
 @router.delete("/{company_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_company(
     company_id: str,
-    current_user: UserPublic = Depends(require_role(UserRole.PLACEMENT_OFFICER.value)),
+    current_user: UserPublic = Depends(
+        require_role(UserRole.PLACEMENT_OFFICER.value, UserRole.ADMIN.value)
+    ),
 ):
     company = await get_company_or_404(company_id)
     db = get_database()

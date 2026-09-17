@@ -40,6 +40,15 @@ async def list_enrolled_courses(current_user: UserPublic = Depends(get_current_u
     return [to_public_course(c) for c in courses]
 
 
+@router.get("/all", response_model=list[CoursePublic])
+async def list_all_courses(
+    current_user: UserPublic = Depends(require_role(UserRole.ADMIN.value)),
+):
+    db = get_database()
+    courses = await db.courses.find().sort("created_at", -1).to_list(length=1000)
+    return [to_public_course(c) for c in courses]
+
+
 @router.post("/{course_id}/students", response_model=CoursePublic)
 async def add_student(
     course_id: str,

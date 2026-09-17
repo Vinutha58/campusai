@@ -4,8 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { StudentDashboard } from "@/components/dashboard/StudentDashboard";
 import { FacultyDashboard } from "@/components/dashboard/FacultyDashboard";
 import { PlacementOfficerDashboard } from "@/components/dashboard/PlacementOfficerDashboard";
-import { ComingSoon } from "@/components/dashboard/ComingSoon";
-import { ROLE_LABELS } from "@/lib/types";
+import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -23,5 +22,5 @@ export default function DashboardPage() {
     return <PlacementOfficerDashboard />;
   }
 
-  return <ComingSoon title={`${ROLE_LABELS[user.role]} Dashboard`} />;
+  return <AdminDashboard />;
 }
