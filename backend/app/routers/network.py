@@ -5,6 +5,7 @@ from bson.errors import InvalidId
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.deps import get_current_user
+from app.core.notify import notify
 from app.db.mongodb import get_database
 from app.models.network import (
     CommentCreate,
@@ -16,6 +17,7 @@ from app.models.network import (
     to_public_post,
     to_public_profile,
 )
+from app.models.notification import NotificationType
 from app.models.user import UserPublic
 
 router = APIRouter()
@@ -160,6 +162,14 @@ async def toggle_like(post_id: str, current_user: UserPublic = Depends(get_curre
         await db.posts.update_one({"_id": post["_id"]}, {"$pull": {"liked_by": me}})
     else:
         await db.posts.update_one({"_id": post["_id"]}, {"$addToSet": {"liked_by": me}})
+        if str(post["author_id"]) != current_user.id:
+            await notify(
+                post["author_id"],
+                NotificationType.NETWORK,
+                "New like on your post",
+                f"{current_user.name} liked your post.",
+                "/network",
+            )
 
     updated = await _get_post_or_404(post_id)
     return to_public_post(updated, current_user.id)
@@ -179,5 +189,15 @@ async def add_comment(
         "created_at": datetime.now(timezone.utc),
     }
     await db.posts.update_one({"_id": post["_id"]}, {"$push": {"comments": comment}})
+
+    if str(post["author_id"]) != current_user.id:
+        await notify(
+            post["author_id"],
+            NotificationType.NETWORK,
+            "New comment on your post",
+            f"{current_user.name} commented: \"{data.text[:80]}\"",
+            "/network",
+        )
+
     updated = await _get_post_or_404(post_id)
     return to_public_post(updated, current_user.id)

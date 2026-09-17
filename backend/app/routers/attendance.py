@@ -2,6 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends
 
 from app.core.deps import require_role
+from app.core.notify import notify
 from app.core.ownership import ensure_owns_course, get_course_or_404
 from app.db.mongodb import get_database
 from app.models.attendance import (
@@ -10,6 +11,7 @@ from app.models.attendance import (
     attendance_document,
     to_public_attendance,
 )
+from app.models.notification import NotificationType
 from app.models.user import UserPublic, UserRole
 
 router = APIRouter()
@@ -33,6 +35,17 @@ async def mark_attendance(
     saved = await db.attendance.find_one(
         {"course_id": ObjectId(data.course_id), "date": doc["date"]}
     )
+
+    for entry in data.records:
+        if not entry.present:
+            await notify(
+                entry.student_id,
+                NotificationType.ATTENDANCE,
+                "Marked absent",
+                f"You were marked absent for {course['name']} on {data.date.strftime('%b %d, %Y')}.",
+                "/attendance",
+            )
+
     return to_public_attendance(saved)
 
 

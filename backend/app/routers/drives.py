@@ -5,9 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.deps import get_current_user, require_role
 from app.core.lookups import get_company_or_404, get_drive_or_404
+from app.core.notify import notify_many
 from app.db.mongodb import get_database
 from app.models.application import ApplicationStatus
 from app.models.drive import DriveCreate, DrivePublic, new_drive_document, to_public_drive
+from app.models.notification import NotificationType
 from app.models.user import UserPublic, UserRole
 
 router = APIRouter()
@@ -25,6 +27,16 @@ async def create_drive(
     doc = new_drive_document(data, company["name"])
     result = await db.drives.insert_one(doc)
     doc["_id"] = result.inserted_id
+
+    student_ids = [s["_id"] async for s in db.users.find({"role": UserRole.STUDENT.value}, {"_id": 1})]
+    await notify_many(
+        student_ids,
+        NotificationType.PLACEMENT,
+        f"New opportunity: {doc['job_role']} at {company['name']}",
+        f"A new placement drive is open. Apply before {data.application_deadline.strftime('%b %d, %Y')}.",
+        "/placements",
+    )
+
     return to_public_drive(doc)
 
 

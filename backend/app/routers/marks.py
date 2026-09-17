@@ -2,9 +2,11 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends
 
 from app.core.deps import get_current_user, require_role
+from app.core.notify import notify
 from app.core.ownership import ensure_owns_course, get_course_or_404
 from app.db.mongodb import get_database
 from app.models.marks import MarkPublic, MarkUpsert, mark_document, to_public_mark
+from app.models.notification import NotificationType
 from app.models.user import UserPublic, UserRole
 
 router = APIRouter()
@@ -38,6 +40,15 @@ async def upsert_mark(
             "assessment_name": doc["assessment_name"],
         }
     )
+
+    await notify(
+        data.student_id,
+        NotificationType.MARKS,
+        f"Marks updated: {doc['assessment_name']}",
+        f"Your {doc['assessment_name']} marks for {course['name']} have been updated.",
+        "/marks",
+    )
+
     return to_public_mark(saved)
 
 

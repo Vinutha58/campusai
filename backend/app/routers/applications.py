@@ -5,8 +5,10 @@ from fastapi import APIRouter, Depends
 
 from app.core.deps import get_current_user, require_role
 from app.core.lookups import get_application_or_404, get_drive_or_404
+from app.core.notify import notify
 from app.db.mongodb import get_database
-from app.models.application import ApplicationPublic, StatusUpdate, to_public_application
+from app.models.application import ApplicationPublic, ApplicationStatus, StatusUpdate, to_public_application
+from app.models.notification import NotificationType
 from app.models.user import UserPublic, UserRole
 
 router = APIRouter()
@@ -51,4 +53,16 @@ async def update_status(
         {"$set": {"status": data.status.value, "updated_at": datetime.now(timezone.utc)}},
     )
     updated = await db.applications.find_one({"_id": application["_id"]})
+
+    title = (
+        "Interview scheduled" if data.status == ApplicationStatus.INTERVIEW else "Application status updated"
+    )
+    await notify(
+        application["student_id"],
+        NotificationType.APPLICATION,
+        title,
+        f"Your application for {application['job_role']} at {application['company_name']} is now {data.status.value}.",
+        "/applications",
+    )
+
     return to_public_application(updated)

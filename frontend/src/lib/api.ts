@@ -643,6 +643,60 @@ export function searchUsersToMessage(q: string) {
   return authedJson<UserSearchResult[]>(`/api/messages/search?q=${encodeURIComponent(q)}`);
 }
 
+// Notifications
+export type NotificationType =
+  | "assignment"
+  | "material"
+  | "quiz"
+  | "marks"
+  | "attendance"
+  | "placement"
+  | "application"
+  | "network"
+  | "message"
+  | "system";
+
+export type Notification = {
+  id: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  link: string | null;
+  is_read: boolean;
+  created_at: string;
+};
+
+export function getNotifications() {
+  return authedJson<Notification[]>("/api/notifications");
+}
+
+export function getUnreadNotificationCount() {
+  return authedJson<{ count: number }>("/api/notifications/unread-count");
+}
+
+export function markNotificationRead(id: string) {
+  return authedJson<Notification>(`/api/notifications/${id}/read`, { method: "POST" });
+}
+
+export function markAllNotificationsRead() {
+  return authedJson<{ status: string }>("/api/notifications/read-all", { method: "POST" });
+}
+
+// Search
+export type SearchCategory = "people" | "courses" | "companies" | "opportunities" | "posts" | "materials";
+
+export type SearchResult = {
+  id: string;
+  category: SearchCategory;
+  title: string;
+  subtitle: string;
+  link: string | null;
+};
+
+export function globalSearch(q: string) {
+  return authedJson<SearchResult[]>(`/api/search?q=${encodeURIComponent(q)}`);
+}
+
 // Authenticated file download (can't use a plain <a href> since it needs the Bearer header)
 export async function downloadFile(path: string, filename: string) {
   const res = await fetch(`${API_URL}${path}`, { headers: authHeaders() });

@@ -6,8 +6,10 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 
 from app.core.deps import get_current_user, require_role
+from app.core.notify import notify_many
 from app.core.ownership import ensure_owns_course, get_course_or_404
 from app.core.storage import get_upload_path, save_upload
+from app.models.notification import NotificationType
 from app.db.mongodb import get_database
 from app.models.assignment import (
     AssignmentCreate,
@@ -47,6 +49,15 @@ async def create_assignment(
     doc = new_assignment_document(data)
     result = await db.assignments.insert_one(doc)
     doc["_id"] = result.inserted_id
+
+    await notify_many(
+        course.get("student_ids", []),
+        NotificationType.ASSIGNMENT,
+        f"New assignment: {data.title}",
+        f"{course['name']} has a new assignment due {data.due_date.strftime('%b %d, %Y')}.",
+        "/assignments",
+    )
+
     return to_public_assignment(doc)
 
 

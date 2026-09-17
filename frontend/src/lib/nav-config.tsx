@@ -54,6 +54,7 @@ const studentNav: NavGroup[] = [
       { label: "Attendance", href: "/attendance", icon: CalendarCheck2 },
       { label: "Marks", href: "/marks", icon: Award },
       { label: "Quizzes", href: "/quizzes", icon: Sparkles },
+      { label: "Materials", href: "/materials", icon: FolderCog },
     ],
   },
   {

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from app.core.deps import get_current_user
+from app.core.notify import notify
 from app.db.mongodb import get_database
 from app.models.message import (
     ConversationPublic,
@@ -15,6 +16,7 @@ from app.models.message import (
     new_message_document,
     to_public_message,
 )
+from app.models.notification import NotificationType
 from app.models.user import UserPublic, UserRole
 
 router = APIRouter()
@@ -139,6 +141,15 @@ async def send_message(
                 f"last_read.{current_user.id}": doc["created_at"],
             }
         },
+    )
+
+    other_id = next(pid for pid in convo["participant_ids"] if str(pid) != current_user.id)
+    await notify(
+        other_id,
+        NotificationType.MESSAGE,
+        f"New message from {current_user.name}",
+        data.text[:120],
+        "/messages",
     )
 
     return to_public_message(doc)

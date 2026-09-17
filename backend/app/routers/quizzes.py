@@ -5,8 +5,10 @@ from bson.errors import InvalidId
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.deps import get_current_user, require_role
+from app.core.notify import notify_many
 from app.core.ownership import ensure_owns_course, get_course_or_404
 from app.db.mongodb import get_database
+from app.models.notification import NotificationType
 from app.models.quiz import (
     QuizAttemptResult,
     QuizAttemptSubmit,
@@ -47,6 +49,15 @@ async def create_quiz(
     doc = new_quiz_document(data)
     result = await db.quizzes.insert_one(doc)
     doc["_id"] = result.inserted_id
+
+    await notify_many(
+        course.get("student_ids", []),
+        NotificationType.QUIZ,
+        f"New quiz: {data.title}",
+        f"{course['name']} has a new quiz available.",
+        "/quizzes",
+    )
+
     return to_public_quiz(doc)
 
 

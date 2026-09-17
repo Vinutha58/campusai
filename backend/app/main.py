@@ -20,7 +20,9 @@ from app.routers import (
     marks,
     messages,
     network,
+    notifications,
     quizzes,
+    search,
     students,
 )
 
@@ -58,3 +60,5 @@ app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"]
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 app.include_router(network.router, prefix="/api/network", tags=["network"])
 app.include_router(messages.router, prefix="/api/messages", tags=["messages"])
+app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
+app.include_router(search.router, prefix="/api/search", tags=["search"])
