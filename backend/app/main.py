@@ -13,16 +13,21 @@ from app.routers import (
     attendance,
     auth,
     campusgpt,
+    career_ai,
     companies,
     courses,
     drives,
     health,
+    interview,
     materials,
     marks,
     messages,
     network,
     notifications,
     quizzes,
+    readiness,
+    resume,
+    roadmap,
     search,
     students,
 )
@@ -64,3 +69,8 @@ app.include_router(messages.router, prefix="/api/messages", tags=["messages"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 app.include_router(search.router, prefix="/api/search", tags=["search"])
 app.include_router(campusgpt.router, prefix="/api/campusgpt", tags=["campusgpt"])
+app.include_router(career_ai.router, prefix="/api/career-ai", tags=["career-ai"])
+app.include_router(resume.router, prefix="/api/resume", tags=["resume"])
+app.include_router(roadmap.router, prefix="/api/roadmap", tags=["roadmap"])
+app.include_router(interview.router, prefix="/api/interview", tags=["interview"])
+app.include_router(readiness.router, prefix="/api/readiness", tags=["readiness"])

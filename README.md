@@ -6,7 +6,7 @@ CampusAI unifies academics, an AI assistant, career development, placements, and
 
 ## Status
 
-🚧 **All 4 roles, Campus Network, Messaging, Notifications, Search, and CampusGPT are live.** Real authentication, complete Faculty/Placement/Admin tools, a working social layer (profiles, feed, follows), direct messaging, a real-time notification center, role-aware global search, and an AI chat assistant for students backed by a swappable OpenAI/Gemini/Claude provider layer — **CampusGPT needs a real API key entered in AI Configuration (Admin) before it will actually respond.** Career AI is what's left — see milestones below.
+🎉 **The full roadmap is live.** Real authentication, complete Faculty/Placement/Admin tools, a working social layer (profiles, feed, follows), direct messaging, a real-time notification center, role-aware global search, and a complete AI-powered career suite for students — CampusGPT, Career AI chat, a resume builder with AI review, skills/certifications management, an AI career roadmap generator, AI-driven mock interview practice, and a transparent placement-readiness snapshot — all backed by a swappable OpenAI/Gemini/Claude provider layer. **The AI features need a real provider API key entered in AI Configuration (Admin) before they'll actually respond** — until then they fail gracefully with a clear message instead of crashing.
 
 ## Tech stack
 
@@ -14,7 +14,7 @@ CampusAI unifies academics, an AI assistant, career development, placements, and
 - **Backend:** FastAPI (Python), modular routers
 - **Database:** MongoDB (via Docker Compose for local dev)
 - **Auth:** Real email + password, bcrypt-hashed, JWT sessions. College-email OTP is deferred until an email-sending provider is set up.
-- **AI:** Centralized provider-adapter layer (OpenAI / Gemini / Claude), configured by an admin in AI Configuration and consumed by CampusGPT
+- **AI:** Centralized provider-adapter layer (OpenAI / Gemini / Claude), configured by an admin in AI Configuration and consumed by CampusGPT, Career AI, resume review, career roadmap generation, and mock interview practice
 
 ## Project structure
 
@@ -83,4 +83,8 @@ App available at `http://localhost:3000`. Register a new account from the landin
 - [x] Notifications — real-time notification center covering assignments, materials, quizzes, marks, attendance, placement drives, application status, Campus Network activity, and messages, for all 4 roles
 - [x] Search — role-aware global search across people, courses, opportunities, companies, materials, and Campus Network posts
 - [x] CampusGPT — AI chat assistant for students (doubts, notes, study plans), backed by a swappable OpenAI/Gemini/Claude provider layer configured in AI Configuration — requires a real API key to produce actual responses
-- [ ] Career AI
+- [x] Career AI — a full career suite for students: Career AI chat (roadmaps, skill gaps, interview strategy), a resume builder with AI review (no ATS scoring), skills and certifications management, an AI-generated career roadmap, AI-driven mock interview practice with per-answer feedback, and a transparent placement-readiness snapshot built from real attendance/marks/skills/resume/application data — the AI-backed parts share the same provider layer as CampusGPT and need a real API key
+
+## Roadmap complete
+
+Every milestone from the original plan has shipped. From here, further work would mean deepening existing features (e.g. college-email OTP verification, richer analytics) rather than adding new roadmap items.

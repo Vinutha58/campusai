@@ -740,3 +740,113 @@ export async function downloadFile(path: string, filename: string) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// Career AI chat (same shape as CampusGPT, separate conversation/endpoint)
+export function getCareerChatHistory() {
+  return authedJson<ChatMessage[]>("/api/career-ai/messages");
+}
+
+export function sendCareerChatMessage(content: string) {
+  return authedJson<ChatExchange>("/api/career-ai/messages", {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
+}
+
+export function clearCareerChatHistory() {
+  return authedJson<void>("/api/career-ai/messages", { method: "DELETE" });
+}
+
+// Resume
+export type EducationEntry = { institution: string; degree: string; field: string; start_year: string; end_year: string };
+export type ExperienceEntry = { title: string; organization: string; start_date: string; end_date: string; description: string };
+export type ProjectEntry = { title: string; description: string; tech: string[]; link: string };
+export type ResumeLinks = { github: string; linkedin: string; portfolio: string };
+
+export type Resume = {
+  summary: string;
+  education: EducationEntry[];
+  experience: ExperienceEntry[];
+  projects: ProjectEntry[];
+  links: ResumeLinks;
+  updated_at: string | null;
+};
+
+export type ResumeInput = {
+  summary: string;
+  education: EducationEntry[];
+  experience: ExperienceEntry[];
+  projects: ProjectEntry[];
+  links: ResumeLinks;
+};
+
+export function getMyResume() {
+  return authedJson<Resume>("/api/resume/me");
+}
+
+export function updateMyResume(data: ResumeInput) {
+  return authedJson<Resume>("/api/resume/me", { method: "PUT", body: JSON.stringify(data) });
+}
+
+export function reviewMyResume() {
+  return authedJson<{ feedback: string }>("/api/resume/review", { method: "POST" });
+}
+
+// Career Roadmap
+export type Roadmap = {
+  target_role: string;
+  content: string;
+  generated_at: string;
+};
+
+export function getMyRoadmap() {
+  return authedJson<Roadmap | null>("/api/roadmap/me");
+}
+
+export function generateRoadmap(targetRole: string, notes: string) {
+  return authedJson<Roadmap>("/api/roadmap/generate", {
+    method: "POST",
+    body: JSON.stringify({ target_role: targetRole, notes }),
+  });
+}
+
+// Interview Preparation
+export type InterviewQuestion = { question: string; answer: string | null; feedback: string | null };
+
+export type InterviewSession = {
+  id: string;
+  topic: string;
+  questions: InterviewQuestion[];
+  created_at: string;
+};
+
+export function getInterviewSessions() {
+  return authedJson<InterviewSession[]>("/api/interview/sessions");
+}
+
+export function generateInterviewSession(topic: string) {
+  return authedJson<InterviewSession>("/api/interview/generate", {
+    method: "POST",
+    body: JSON.stringify({ topic }),
+  });
+}
+
+export function submitInterviewAnswer(sessionId: string, questionIndex: number, answer: string) {
+  return authedJson<InterviewSession>(`/api/interview/sessions/${sessionId}/answer`, {
+    method: "POST",
+    body: JSON.stringify({ question_index: questionIndex, answer }),
+  });
+}
+
+// Placement Readiness
+export type ReadinessFactor = { label: string; score: number; detail: string };
+
+export type Readiness = {
+  overall_score: number;
+  factors: ReadinessFactor[];
+  suggestions: string[];
+};
+
+export function getMyReadiness() {
+  return authedJson<Readiness>("/api/readiness/me");
+}
